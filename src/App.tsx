@@ -2,12 +2,16 @@ import React from 'react';
 import './App.css';
 import {Todolist} from "./Todolist";
 
-export type TasksType = TaskType[]
+export type TasksType = Task[]
 
 type TaskType = {
-    id: number,
+    // id: number,
     title: string,
     isDone: boolean
+}
+
+interface Task extends TaskType {
+    id: number,
 }
 
 function App() {
