@@ -19,6 +19,7 @@ export function Todolist(props: PropsType) {
 
   const [title, setTitle] = useState('')
 
+
   const onChangeHandler = (value: string) => {
     setTitle(value)
   }
@@ -30,6 +31,15 @@ export function Todolist(props: PropsType) {
     if (key === 'Enter') {
       onClickHandler()
     }
+  }
+  const onAllClickHandler = () => {
+    props.changeFilter("all")
+  }
+  const onActiveClickHandler = () => {
+    props.changeFilter("active")
+  }
+  const onCompletedClickHandler = () => {
+    props.changeFilter("completed")
   }
 
   return <div>
@@ -54,21 +64,9 @@ export function Todolist(props: PropsType) {
       }
     </ul>
     <div>
-      <button onClick={() => {
-        props.changeFilter("all")
-      }}>
-        All
-      </button>
-      <button onClick={() => {
-        props.changeFilter("active")
-      }}>
-        Active
-      </button>
-      <button onClick={() => {
-        props.changeFilter("completed")
-      }}>
-        Completed
-      </button>
+      <button onClick={onAllClickHandler}>All</button>
+      <button onClick={onActiveClickHandler}>Active</button>
+      <button onClick={onCompletedClickHandler}>Completed</button>
     </div>
   </div>
 }
