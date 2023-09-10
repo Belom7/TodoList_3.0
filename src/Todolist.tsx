@@ -53,7 +53,7 @@ export function Todolist(props: PropsType) {
   //   props.changeFilter("completed")
   // }
 
-  const tsarHandler = (value:FilterValuesType) => {
+  const tsarHandler = (value: FilterValuesType) => {
     props.changeFilter(value)
     setButtonName(value)
   }
@@ -71,10 +71,10 @@ export function Todolist(props: PropsType) {
       />
       <button onClick={onClickHandler}>+</button>
     </div>
-    {error? <div className={styles.errorMessage}>{error}</div> : <></>}
+    {error ? <div className={styles.errorMessage}>{error}</div> : <></>}
     <ul>
       {
-        props.tasks.map(t => <li key={t.id}>
+        props.tasks.map(t => <li key={t.id} className={t.isDone ? styles.isDone : ''}>
           <button onClick={() => {
             props.removeTask(t.id)
           }}>x
@@ -89,9 +89,14 @@ export function Todolist(props: PropsType) {
       }
     </ul>
     <div>
-      <button className={buttonName === 'all'? styles.activeFilter : ''} onClick={()=>tsarHandler('all')}>All</button>
-      <button className={buttonName === 'active'? styles.activeFilter : ''} onClick={()=>tsarHandler('active')}>Active</button>
-      <button className={buttonName === 'completed'? styles.activeFilter : ''} onClick={()=>tsarHandler('completed')}>Completed</button>
+      <button className={buttonName === 'all' ? styles.activeFilter : ''} onClick={() => tsarHandler('all')}>All
+      </button>
+      <button className={buttonName === 'active' ? styles.activeFilter : ''}
+              onClick={() => tsarHandler('active')}>Active
+      </button>
+      <button className={buttonName === 'completed' ? styles.activeFilter : ''}
+              onClick={() => tsarHandler('completed')}>Completed
+      </button>
     </div>
   </div>
 }
