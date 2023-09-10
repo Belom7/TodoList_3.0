@@ -42,17 +42,6 @@ export function Todolist(props: PropsType) {
       onClickHandler()
     }
   }
-
-  // const onAllClickHandler = () => {
-  //   props.changeFilter("all")
-  // }
-  // const onActiveClickHandler = () => {
-  //   props.changeFilter("active")
-  // }
-  // const onCompletedClickHandler = () => {
-  //   props.changeFilter("completed")
-  // }
-
   const tsarHandler = (value: FilterValuesType) => {
     props.changeFilter(value)
     setButtonName(value)
@@ -82,7 +71,6 @@ export function Todolist(props: PropsType) {
           <input type="checkbox"
                  checked={t.isDone}
                  onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeIsDoneHandler(e.currentTarget.checked, t.id)}
-
           />
           <span>{t.title}</span>
         </li>)
