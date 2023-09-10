@@ -25,9 +25,10 @@ export function Todolist(props: PropsType) {
     setTitle(value)
   }
   const onClickHandler = () => {
+    if (title.trim() !== '') {
     props.addTask(title)
     setTitle('')
-  }
+  }}
   const onKeyPressHandler = (key: string) => {
     if (key === 'Enter') {
       onClickHandler()
