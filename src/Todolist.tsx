@@ -3,7 +3,7 @@ import {FilterValuesType} from './App';
 import styles from './Todolist.module.css';
 
 
-type TaskType = {
+export type TaskType = {
   id: string
   title: string
   isDone: boolean
@@ -11,11 +11,15 @@ type TaskType = {
 
 type PropsType = {
   title: string
+  todoListId: string
+  filter: FilterValuesType,
   tasks: Array<TaskType>
-  removeTask: (taskId: string) => void
-  changeFilter: (value: FilterValuesType) => void
-  addTask: (title: string) => void
-  changeIsDone: (isDone: boolean, id: string) => void
+
+  removeTask: (todoListID: string, taskId: string) => void
+  changeFilter: (todoListID: string, value: FilterValuesType) => void
+  addTask: (todoListID: string, title: string) => void
+  changeIsDone: (todoListID: string, isDone: boolean, id: string) => void
+  removeTodolist: (todoListID: string) => void
 }
 
 export function Todolist(props: PropsType) {
@@ -31,7 +35,7 @@ export function Todolist(props: PropsType) {
   }
   const onClickHandler = () => {
     if (title.trim() !== '') {
-      props.addTask(title)
+      props.addTask(props.todoListId, title)
       setTitle('')
     } else {
       setError('Title is required')
@@ -43,15 +47,21 @@ export function Todolist(props: PropsType) {
     }
   }
   const tsarHandler = (value: FilterValuesType) => {
-    props.changeFilter(value)
+    props.changeFilter(props.todoListId, value)
     setButtonName(value)
   }
   const onChangeIsDoneHandler = (isDone: boolean, id: string) => {
-    props.changeIsDone(isDone, id)
+    props.changeIsDone(props.todoListId, isDone, id)
+  }
+  const onClickRemoveTodoListHandler = () => {
+    props.removeTodolist(props.todoListId)
   }
 
   return <div>
-    <h3>{props.title}</h3>
+    <h3>
+      <button onClick={onClickRemoveTodoListHandler}>X</button>
+      {props.title}
+    </h3>
     <div>
       <input className={error ? styles.error : ''}
              value={title}
@@ -65,7 +75,7 @@ export function Todolist(props: PropsType) {
       {
         props.tasks.map(t => <li key={t.id} className={t.isDone ? styles.isDone : ''}>
           <button onClick={() => {
-            props.removeTask(t.id)
+            props.removeTask(props.todoListId, t.id)
           }}>x
           </button>
           <input type="checkbox"
