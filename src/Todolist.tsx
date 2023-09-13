@@ -25,27 +25,8 @@ type PropsType = {
 
 export function Todolist(props: PropsType) {
 
-  // const [title, setTitle] = useState('')
-  // const [error, setError] = useState<string | null>(null)
   const [buttonName, setButtonName] = useState('all')
 
-  // const onChangeHandler = (value: string) => {
-  //   setError(null)
-  //   setTitle(value)
-  // }
-  // const onClickHandler = () => {
-  //   if (title.trim() !== '') {
-  //     props.addTask(props.todoListId, title)
-  //     setTitle('')
-  //   } else {
-  //     setError('Title is required')
-  //   }
-  // }
-  // const onKeyPressHandler = (key: string) => {
-  //   if (key === 'Enter') {
-  //     onClickHandler()
-  //   }
-  // }
   const tsarHandler = (value: FilterValuesType) => {
     props.changeFilter(props.todoListId, value)
     setButtonName(value)
@@ -56,6 +37,9 @@ export function Todolist(props: PropsType) {
   const onClickRemoveTodoListHandler = () => {
     props.removeTodolist(props.todoListId)
   }
+  const addTaskHandler = (title: string) => {
+    props.addTask(props.todoListId, title)
+  }
 
   return <div>
     <h3>
@@ -63,15 +47,8 @@ export function Todolist(props: PropsType) {
       {props.title}
     </h3>
     <div>
-      <AddItemForm todoListId={props.todoListId} addTask={props.addTask}/>
-      {/*<input className={error ? styles.error : ''}*/}
-      {/*       value={title}*/}
-      {/*       onChange={(e) => onChangeHandler(e.currentTarget.value)}*/}
-      {/*       onKeyPress={(e) => onKeyPressHandler(e.key)}*/}
-      {/*/>*/}
-      {/*<button onClick={onClickHandler}>+</button>*/}
+      <AddItemForm callback={addTaskHandler}/>
     </div>
-    {/*{error ? <div className={styles.errorMessage}>{error}</div> : <></>}*/}
     <ul>
       {
         props.tasks.map(t => <li key={t.id} className={t.isDone ? styles.isDone : ''}>

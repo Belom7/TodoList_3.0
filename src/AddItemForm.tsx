@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import styles from "./Todolist.module.css";
 
 type AddItemFormPropsType = {
-  todoListId: string,
-
-  addTask: (todoListID: string, title: string) => void,
+  callback: (title: string) => void,
 }
 
 export const AddItemForm = (props: AddItemFormPropsType) => {
@@ -18,7 +16,7 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
   }
   const onClickHandler = () => {
     if (title.trim() !== '') {
-      props.addTask(props.todoListId, title)
+      props.callback(title)
       setTitle('')
     } else {
       setError('Title is required')
