@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import styles from "./Todolist.module.css";
+import styles from "../Todolist.module.css";
 
 type AddItemFormPropsType = {
   callback: (title: string) => void,
