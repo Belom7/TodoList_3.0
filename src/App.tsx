@@ -3,6 +3,10 @@ import './App.css';
 import {TaskType, Todolist} from './Todolist';
 import {v1} from "uuid";
 import {AddItemForm} from "./components/AddItemForm";
+import {ButtonAppBar} from "./components/ButtonAppBar";
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import {Paper} from "@mui/material";
 
 export type FilterValuesType = "all" | "active" | "completed";
 type TodoListType = {
@@ -95,30 +99,42 @@ function App() {
     return tasksForTodolist
   }
 
+
   const todolistForRender: JSX.Element[] = todoLists.map(el => {
     const taskForRender = getFilteredTasksFoeRender(tasks[el.id], el.filter)
     return (
-      <Todolist
-        key={el.id}
-        title={el.title}
-        filter={el.filter}
-        todoListId={el.id}
-        tasks={taskForRender}
-        removeTask={removeTask}
-        changeFilter={changeTodolistFilter}
-        addTask={addTask}
-        changeIsDone={toggleTaskStatus}
-        removeTodolist={removeTodolist}
-        changeTask={changeTask}
-        changeTodoList={changeTodoList}
-      />
+      <Grid item>
+        <Paper elevation={15} style={{padding: '15px'}}>
+          <Todolist
+            key={el.id}
+            title={el.title}
+            filter={el.filter}
+            todoListId={el.id}
+            tasks={taskForRender}
+            removeTask={removeTask}
+            changeFilter={changeTodolistFilter}
+            addTask={addTask}
+            changeIsDone={toggleTaskStatus}
+            removeTodolist={removeTodolist}
+            changeTask={changeTask}
+            changeTodoList={changeTodoList}
+          />
+        </Paper>
+      </Grid>
     )
   })
 
   return (
     <div className="App">
-      <AddItemForm callback={addTodolist}/>
-      {todolistForRender}
+      <Container fixed>
+        <ButtonAppBar/>
+        <Grid container style={{paddingTop: '15px', paddingBottom: '15px'}}>
+          <AddItemForm callback={addTodolist}/>
+        </Grid>
+        <Grid container spacing={3}>
+          {todolistForRender}
+        </Grid>
+      </Container>
     </div>
   );
 }

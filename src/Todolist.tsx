@@ -3,6 +3,10 @@ import {FilterValuesType} from './App';
 import styles from './Todolist.module.css';
 import {AddItemForm} from "./components/AddItemForm";
 import {EditableSpan} from "./components/EditableSpan";
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 
 
 export type TaskType = {
@@ -46,13 +50,15 @@ export function Todolist(props: PropsType) {
   const changeTodoList = (title: string) => {
     props.changeTodoList(props.todoListId, title)
   }
-  const changeTaskHandler = (taskId:string, value: string) => {
+  const changeTaskHandler = (taskId: string, value: string) => {
     props.changeTask(props.todoListId, taskId, value)
   }
 
   return <div>
     <h3>
-      <button onClick={onClickRemoveTodoListHandler}>X</button>
+      <IconButton aria-label="delete">
+        <DeleteIcon onClick={onClickRemoveTodoListHandler}/>
+      </IconButton>
       <EditableSpan title={props.title} callback={changeTodoList}/>
     </h3>
     <div>
@@ -64,29 +70,27 @@ export function Todolist(props: PropsType) {
 
           return (
             <li key={t.id} className={t.isDone ? styles.isDone : ''}>
-              <button onClick={() => {
-                props.removeTask(props.todoListId, t.id)
-              }}>x
-              </button>
-              <input type="checkbox"
-                     checked={t.isDone}
-                     onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeIsDoneHandler(e.currentTarget.checked, t.id)}
+              <IconButton aria-label="delete">
+                <DeleteIcon onClick={() => {
+                  props.removeTask(props.todoListId, t.id)
+                }}/>
+              </IconButton>
+              <Checkbox checked={t.isDone}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => onChangeIsDoneHandler(e.currentTarget.checked, t.id)}
               />
-              <EditableSpan title={t.title} callback={(title)=>changeTaskHandler(t.id,title)}/>
+              <EditableSpan title={t.title} callback={(title) => changeTaskHandler(t.id, title)}/>
             </li>
           )
         })
       }
     </ul>
     <div>
-      <button className={buttonName === 'all' ? styles.activeFilter : ''} onClick={() => tsarHandler('all')}>All
-      </button>
-      <button className={buttonName === 'active' ? styles.activeFilter : ''}
-              onClick={() => tsarHandler('active')}>Active
-      </button>
-      <button className={buttonName === 'completed' ? styles.activeFilter : ''}
-              onClick={() => tsarHandler('completed')}>Completed
-      </button>
+      <Button variant={buttonName === 'all' ? "contained" : 'outlined'} color="primary"
+              onClick={() => tsarHandler('all')}> All </Button>
+      <Button variant={buttonName === 'active' ? "contained" : 'outlined'} color="primary"
+              onClick={() => tsarHandler('active')}> Active </Button>
+      <Button variant={buttonName === 'completed' ? "contained" : 'outlined'} color="primary"
+              onClick={() => tsarHandler('completed')}> Completed </Button>
     </div>
   </div>
 }

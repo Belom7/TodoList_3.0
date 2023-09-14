@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
-import styles from "../Todolist.module.css";
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+
 
 type AddItemFormPropsType = {
   callback: (title: string) => void,
@@ -28,15 +30,28 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
     }
   }
 
+  const buttonStyle = {
+    maxWidth: '40px',
+    maxHeight: '40px',
+    minWidth: '40px',
+    minHeight: '40px',
+  }
+
   return (
     <div>
-      <input className={error ? styles.error : ''}
-             value={title}
-             onChange={(e) => onChangeHandler(e.currentTarget.value)}
-             onKeyPress={(e) => onKeyPressHandler(e.key)}
+      <TextField id="outlined-basic"
+                 label={error? 'Title is required' : 'Please type here'}
+                 variant="outlined"
+                 size="small"
+                 error={!!error}
+                 value={title}
+                 onChange={(e) => onChangeHandler(e.currentTarget.value)}
+                 onKeyPress={(e) => onKeyPressHandler(e.key)}
       />
-      <button onClick={onClickHandler}>+</button>
-      <>{error ? <div className={styles.errorMessage}>{error}</div> : <></>}</>
+      <Button style={buttonStyle}
+              onClick={onClickHandler}
+              variant={'contained'}
+              color={'primary'}>+</Button>
     </div>
   );
 };
