@@ -13,7 +13,7 @@ import {
   RemoveTodolistAC,
   todolistsReducer
 } from "./state/todolists-reducer";
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, tasksReducer} from "./state/tasks-reducer";
+import {AddTaskAC, changeTaskStatusAC, ChangeTaskTitleAC, RemoveTaskAC, tasksReducer} from "./state/tasks-reducer";
 
 export type FilterValuesType = "all" | "active" | "completed";
 export type TodolistType = {
@@ -49,11 +49,11 @@ function AppWitchReducer() {
 
 
   function removeTask(id: string, todolistId: string) {
-    dispatchToTasks(removeTaskAC(todolistId, id))
+    dispatchToTasks(RemoveTaskAC(todolistId, id))
   }
 
   function addTask(title: string, todolistId: string) {
-    dispatchToTasks(addTaskAC(todolistId, title))
+    dispatchToTasks(AddTaskAC(todolistId, title))
   }
 
   function changeStatus(id: string, isDone: boolean, todolistId: string) {
@@ -61,7 +61,7 @@ function AppWitchReducer() {
   }
 
   function changeTaskTitle(id: string, newTitle: string, todolistId: string) {
-    dispatchToTasks(changeTaskTitleAC(todolistId, id, newTitle))
+    dispatchToTasks(ChangeTaskTitleAC(todolistId, id, newTitle))
   }
 
   function changeFilter(value: FilterValuesType, todolistId: string) {
