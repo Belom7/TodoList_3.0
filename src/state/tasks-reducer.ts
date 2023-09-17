@@ -53,7 +53,7 @@ export const tasksReducer = (state = initialState, action: ActionsType): TasksSt
     case "ADD-TODOLIST": {
       return {
         ...state,
-        [action.todoListId]: []
+        [action.payload.todoListId]: []
       }
     }
     case "REMOVE-TODOLIST": {
