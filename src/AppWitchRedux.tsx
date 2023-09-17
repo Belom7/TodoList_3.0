@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import './App.css';
 import {TaskType} from './Todolist';
 import {AddItemForm} from './AddItemForm';
@@ -28,9 +28,9 @@ function AppWitchRedux() {
 
   const dispatch = useDispatch()
 
-  function addTodolist(title: string) {
+  const addTodolist = useCallback((title: string) => {
     dispatch(AddTodolistAC(title))
-  }
+  },[dispatch])
 
   return (
     <div className="App">
@@ -51,7 +51,7 @@ function AppWitchRedux() {
         </Grid>
         <Grid container spacing={3}>
           {
-            todolists.map(tl => {
+            todolists?.map(tl => {
               return <Grid key={tl.id} item>
                 <Paper style={{padding: "10px"}}>
                   <TodolistWitchRedux todolist={tl}/>
