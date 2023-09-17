@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from 'react';
+import React, {ChangeEvent, memo, useCallback} from 'react';
 import {AddItemForm} from './AddItemForm';
 import {EditableSpan} from './EditableSpan';
 import IconButton from '@mui/material/IconButton/IconButton';
@@ -9,6 +9,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./state/store";
 import {AddTaskAC, changeTaskStatusAC, ChangeTaskTitleAC, RemoveTaskAC} from "./state/tasks-reducer";
 import {changeTodolistFilterAC, ChangeTodolistTitleAC, RemoveTodolistAC} from "./state/todolists-reducer";
+import {ButtonThisMemo} from "./ButtonThisMemo";
 
 
 export type TaskType = {
@@ -21,20 +22,23 @@ type PropsType = {
   todolist: TodolistType
 }
 
-export function TodolistWitchRedux({todolist}: PropsType) {
+export const TodolistWitchRedux = memo(({todolist}: PropsType) => {
+
+  console.log('TodolistWitchRedux')
+
   const {id, title, filter} = todolist
 
   let tasks = useSelector<AppRootStateType, TaskType[]>(state => state.tasks[id])
   const dispatch = useDispatch()
 
-  const addTask = (title: string) => dispatch(AddTaskAC(id, title))
+  const addTask = useCallback((title: string) => dispatch(AddTaskAC(id, title)), [dispatch, id])
 
   const removeTodolist = () => dispatch(RemoveTodolistAC(id))
   const changeTodolistTitle = (title: string) => dispatch(ChangeTodolistTitleAC(id, title))
 
-  const onAllClickHandler = () => dispatch(changeTodolistFilterAC(id, 'all'))
-  const onActiveClickHandler = () => dispatch(changeTodolistFilterAC(id, 'active'))
-  const onCompletedClickHandler = () => dispatch(changeTodolistFilterAC(id, 'completed'))
+  const onAllClickHandler = useCallback(() => dispatch(changeTodolistFilterAC(id, 'all')), [])
+  const onActiveClickHandler = useCallback(() => dispatch(changeTodolistFilterAC(id, 'active')), [])
+  const onCompletedClickHandler = useCallback(() => dispatch(changeTodolistFilterAC(id, 'completed')), [])
 
   if (filter === "active") {
     tasks = tasks.filter(t => !t.isDone);
@@ -77,21 +81,32 @@ export function TodolistWitchRedux({todolist}: PropsType) {
       }
     </div>
     <div>
-      <Button variant={filter === 'all' ? 'outlined' : 'text'}
-              onClick={onAllClickHandler}
-              color={'inherit'}
-      >All
-      </Button>
-      <Button variant={filter === 'active' ? 'outlined' : 'text'}
-              onClick={onActiveClickHandler}
-              color={'primary'}>Active
-      </Button>
-      <Button variant={filter === 'completed' ? 'outlined' : 'text'}
-              onClick={onCompletedClickHandler}
-              color={'secondary'}>Completed
-      </Button>
+      <ButtonThisMemo title={'All'}
+                      variant={filter === 'all' ? 'outlined' : 'text'}
+                      onClick={onAllClickHandler}
+                      color={'inherit'}/>
+      <ButtonThisMemo title={'Active'}
+                      variant={filter === 'active' ? 'outlined' : 'text'}
+                      onClick={onActiveClickHandler}
+                      color={'primary'}/>
+      <ButtonThisMemo title={'Completed'}
+                      variant={filter === 'completed' ? 'outlined' : 'text'}
+                      onClick={onCompletedClickHandler}
+                      color={'secondary'}/>
+      {/*<Button variant={filter === 'all' ? 'outlined' : 'text'}*/}
+      {/*        onClick={onAllClickHandler}*/}
+      {/*        color={'inherit'}>All*/}
+      {/*</Button>*/}
+      {/*<Button variant={filter === 'active' ? 'outlined' : 'text'}*/}
+      {/*        onClick={onActiveClickHandler}*/}
+      {/*        color={'primary'}>Active*/}
+      {/*</Button>*/}
+      {/*<Button variant={filter === 'completed' ? 'outlined' : 'text'}*/}
+      {/*        onClick={onCompletedClickHandler}*/}
+      {/*        color={'secondary'}>Completed*/}
+      {/*</Button>*/}
     </div>
   </div>
-}
+})
 
 
