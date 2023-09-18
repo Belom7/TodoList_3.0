@@ -1,15 +1,15 @@
-import React, {ChangeEvent, memo, useCallback} from 'react';
+import React, {memo, useCallback} from 'react';
 import {AddItemForm} from './AddItemForm';
 import {EditableSpan} from './EditableSpan';
 import IconButton from '@mui/material/IconButton/IconButton';
 import {Delete} from "@mui/icons-material";
-import {Button, Checkbox} from "@mui/material";
 import {TodolistType} from "./AppWitchRedux";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./state/store";
-import {AddTaskAC, changeTaskStatusAC, ChangeTaskTitleAC, RemoveTaskAC} from "./state/tasks-reducer";
+import {AddTaskAC} from "./state/tasks-reducer";
 import {changeTodolistFilterAC, ChangeTodolistTitleAC, RemoveTodolistAC} from "./state/todolists-reducer";
 import {ButtonThisMemo} from "./ButtonThisMemo";
+import {Task} from "./Task";
 
 
 export type TaskType = {
@@ -34,7 +34,7 @@ export const TodolistWitchRedux = memo(({todolist}: PropsType) => {
   const addTask = useCallback((title: string) => dispatch(AddTaskAC(id, title)), [dispatch, id])
 
   const removeTodolist = () => dispatch(RemoveTodolistAC(id))
-  const changeTodolistTitle = (title: string) => dispatch(ChangeTodolistTitleAC(id, title))
+  const changeTodolistTitle = useCallback((title: string) => dispatch(ChangeTodolistTitleAC(id, title)), [dispatch])
 
   const onAllClickHandler = useCallback(() => dispatch(changeTodolistFilterAC(id, 'all')), [])
   const onActiveClickHandler = useCallback(() => dispatch(changeTodolistFilterAC(id, 'active')), [])
@@ -57,26 +57,30 @@ export const TodolistWitchRedux = memo(({todolist}: PropsType) => {
     <div>
       {
         tasks.map(t => {
-          const onClickHandler = () => dispatch(RemoveTaskAC(id, t.id))
-          const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-            let newIsDoneValue = e.currentTarget.checked;
-            dispatch(changeTaskStatusAC(id, t.id, newIsDoneValue))
-          }
-          const onTitleChangeHandler = (newValue: string) => dispatch(ChangeTaskTitleAC(id, t.id, newValue))
+          return (
+            <Task task={t} todoListId={todolist.id} key={t.id}/>
+          )
+
+          // const onClickHandler = () => dispatch(RemoveTaskAC(id, t.id))
+          // const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+          //   let newIsDoneValue = e.currentTarget.checked;
+          //   dispatch(changeTaskStatusAC(id, t.id, newIsDoneValue))
+          // }
+          // const onTitleChangeHandler = (newValue: string) => dispatch(ChangeTaskTitleAC(id, t.id, newValue))
 
 
-          return <div key={t.id} className={t.isDone ? "is-done" : ""}>
-            <Checkbox
-              checked={t.isDone}
-              color="primary"
-              onChange={onChangeHandler}
-            />
-
-            <EditableSpan value={t.title} onChange={onTitleChangeHandler}/>
-            <IconButton onClick={onClickHandler}>
-              <Delete/>
-            </IconButton>
-          </div>
+          // return <div key={t.id} className={t.isDone ? "is-done" : ""}>
+          //   <Checkbox
+          //     checked={t.isDone}
+          //     color="primary"
+          //     onChange={onChangeHandler}
+          //   />
+          //
+          //   <EditableSpan value={t.title} onChange={onTitleChangeHandler}/>
+          //   <IconButton onClick={onClickHandler}>
+          //     <Delete/>
+          //   </IconButton>
+          // </div>
         })
       }
     </div>
