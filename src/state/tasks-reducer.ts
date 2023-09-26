@@ -4,6 +4,8 @@ import {TaskStatuses, TaskType, UpdateTaskModelType} from '../api/todolists-api'
 import {Dispatch} from "redux";
 import {tasksAPI} from "../api/tasks-api";
 import {AppRootStateType} from "./store";
+import {errorAC, ErrorACType, preloaderStatusAC} from "./app-reducer";
+import {AxiosError} from "axios";
 
 export type RemoveTaskActionType = ReturnType<typeof removeTaskAC>
 export type AddTaskActionType = ReturnType<typeof addTaskAC>
@@ -20,6 +22,7 @@ type ActionsType =
   | RemoveTodolistActionType
   | GetTodoListsACActionType
   | GetTaskACType
+  | ErrorACType
 
 const initialState: TasksStateType = {
   /*"todolistId1": [
@@ -148,21 +151,43 @@ export const changeTaskStatusAC = (taskId: string, status: TaskStatuses, todolis
 
 
 export const getTasksTC = (todolistId: string) => (dispatch: Dispatch) => {
+  dispatch(preloaderStatusAC('loading'))
   tasksAPI.getTasks(todolistId)
     .then(res => {
       dispatch(getTaskAC(todolistId, res.data.items))
     })
+    .finally(() => {
+      dispatch(preloaderStatusAC('succeeded'))
+    })
 }
 export const removeTasksTC = (todolistId: string, taskId: string) => (dispatch: Dispatch) => {
+  dispatch(preloaderStatusAC('loading'))
   tasksAPI.deleteTask(todolistId, taskId)
     .then(() => {
       dispatch(removeTaskAC(todolistId, taskId))
     })
+    .finally(() => {
+      dispatch(preloaderStatusAC('succeeded'))
+    })
 }
 export const addTaskTC = (todolistId: string, title: string) => (dispatch: Dispatch) => {
+  dispatch(preloaderStatusAC('loading'))
   tasksAPI.createTask(todolistId, title)
     .then((res) => {
-      dispatch(addTaskAC(res.data.data.item, todolistId))
+      if (res.data.resultCode === 0) {
+        dispatch(addTaskAC(res.data.data.item, todolistId))
+      } else {
+        const messagesError = res.data.messages[0]
+        if (messagesError) {
+          dispatch(errorAC(messagesError))
+        }
+      }
+    })
+    .catch((e: AxiosError<ErrorACType>) => {
+      dispatch(errorAC(e.message))
+    })
+    .finally(() => {
+      dispatch(preloaderStatusAC('succeeded'))
     })
 }
 export const changeTaskTitleTC = (todolistId: string, taskId: string, title: string) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
@@ -176,14 +201,17 @@ export const changeTaskTitleTC = (todolistId: string, taskId: string, title: str
       startDate: task.startDate,
       deadline: task.deadline,
     }
-
+    dispatch(preloaderStatusAC('loading'))
     tasksAPI.updateTask(todolistId, taskId, model)
       .then(() => {
         dispatch(changeTaskTitleAC(taskId, title, todolistId))
       })
+      .finally(() => {
+        dispatch(preloaderStatusAC('succeeded'))
+      })
   }
 }
-export const changeTaskStatusTC = (todolistId: string, taskId: string, status:TaskStatuses) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
+export const changeTaskStatusTC = (todolistId: string, taskId: string, status: TaskStatuses) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
   const task = getState().tasks[todolistId].find(el => el.id === taskId)
   if (task) {
     const model: UpdateTaskModelType = {
@@ -195,9 +223,13 @@ export const changeTaskStatusTC = (todolistId: string, taskId: string, status:Ta
       deadline: task.deadline,
     }
 
+    dispatch(preloaderStatusAC('loading'))
     tasksAPI.updateTask(todolistId, taskId, model)
       .then(() => {
-        dispatch(changeTaskStatusAC(taskId,status,todolistId))
+        dispatch(changeTaskStatusAC(taskId, status, todolistId))
+      })
+      .finally(() => {
+        dispatch(preloaderStatusAC('succeeded'))
       })
   }
 }
