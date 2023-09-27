@@ -1,28 +1,22 @@
-import React, {useCallback, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import './App.css';
-import {Todolist} from './Todolist';
-import {AddItemForm} from './AddItemForm';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import {Menu} from '@mui/icons-material';
-import {
-  addTodolistTC,
-  changeTodolistFilterAC,
-  changeTodolistTitleTC,
-  FilterValuesType, getTodoListTC,
-  removeTodoListTC,
-  TodolistDomainType
-} from './state/todolists-reducer'
 import {useAppDispatch, useAppSelector} from './state/store';
 import {TaskType} from './api/todolists-api'
 import LinearProgress from "@mui/material/LinearProgress";
 import {CustomizedSnackbars} from "./CustomizedSnackbars";
+import {Route, Routes, Navigate} from "react-router-dom";
+import {Login} from "./features/login/Login";
+import {TodoListsList} from "./features/todoListList/TodoListsList";
+import {authMeTC, logOutTC} from "./features/login/auth-reducer";
+import {CircularProgress} from "@mui/material";
+import {RequestStatusType} from "./state/app-reducer";
 
 
 export type TasksStateType = {
@@ -32,31 +26,25 @@ export type TasksStateType = {
 
 function App() {
 
-  useEffect(() => {
-    dispatch(getTodoListTC())
-  }, [])
-
-  const todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists)
-  const status = useAppSelector(state => state.app.status)
+  const status = useAppSelector<RequestStatusType>(state => state.app.status)
+  const isInitialized = useAppSelector<boolean>(state => state.app.initialized)
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const dispatch = useAppDispatch();
 
-  const addTodolist = useCallback((title: string) => {
-    dispatch(addTodolistTC(title))
-  }, [dispatch]);
-  const removeTodolist = useCallback((id: string) => {
-    dispatch(removeTodoListTC(id));
-  }, []);
-  const changeTodolistTitle = useCallback((id: string, title: string) => {
-    dispatch(changeTodolistTitleTC(id, title))
-  }, []);
+  useEffect(() => {
+    dispatch(authMeTC())
+  }, [])
 
+  const LogOutHandler = () => {
+    dispatch(logOutTC())
+  }
 
-
-  const changeFilter = useCallback((value: FilterValuesType, todolistId: string) => {
-    const action = changeTodolistFilterAC(todolistId, value);
-    dispatch(action);
-  }, []);
-
+  if (!isInitialized) {
+    return <div
+      style={{position: 'fixed', top: '30%', textAlign: 'center', width: '100%'}}>
+      <CircularProgress/>
+    </div>
+  }
   return (
     <div className="App">
       <AppBar position="static">
@@ -67,34 +55,19 @@ function App() {
           <Typography variant="h6">
             News
           </Typography>
-          <Button color="inherit">Login</Button>
+          {isLoggedIn && <Button color="inherit" onClick={LogOutHandler}>LogOut</Button>}
         </Toolbar>
       </AppBar>
       {status === 'loading' && <LinearProgress/>}
       <CustomizedSnackbars/>
 
       <Container fixed>
-        <Grid container style={{padding: '20px'}}>
-          <AddItemForm addItem={addTodolist}/>
-        </Grid>
-        <Grid container spacing={3}>
-          {
-            todolists.map(tl => {
-
-              return <Grid item key={tl.id}>
-                <Paper style={{padding: '10px'}}>
-                  <Todolist
-                    todoList={tl}
-                    changeFilter={changeFilter}
-                    // filter={tl.filter}
-                    removeTodolist={removeTodolist}
-                    changeTodolistTitle={changeTodolistTitle}
-                  />
-                </Paper>
-              </Grid>
-            })
-          }
-        </Grid>
+        <Routes>
+          <Route path={'/'} element={<TodoListsList/>}/>
+          <Route path={'/login'} element={<Login/>}/>
+          <Route path={'/404'} element={<h1>404: PAGE NOT FOUND</h1>}/>
+          <Route path={'/*'} element={<Navigate to={'/404'}/>}/>
+        </Routes>
       </Container>
     </div>
   );

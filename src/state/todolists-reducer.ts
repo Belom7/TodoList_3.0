@@ -135,6 +135,12 @@ export const getTodoListTC = () => (dispatch: Dispatch) => {
   todolistsAPI.getTodolists()
     .then(res => {
       dispatch(getTodoListsAC(res.data))
+
+    })
+    .catch((e:AxiosError<ErrorACType>)=>{
+      dispatch(errorAC(e.message))
+    })
+    .finally(()=>{
       dispatch(preloaderStatusAC('succeeded'))
     })
 }

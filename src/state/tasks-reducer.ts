@@ -149,7 +149,6 @@ export const changeTaskStatusAC = (taskId: string, status: TaskStatuses, todolis
   } as const
 }
 
-
 export const getTasksTC = (todolistId: string) => (dispatch: Dispatch) => {
   dispatch(preloaderStatusAC('loading'))
   tasksAPI.getTasks(todolistId)

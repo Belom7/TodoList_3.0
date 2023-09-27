@@ -4,9 +4,9 @@ import {GetTasksResponse, ResponseType, TaskType, UpdateTaskModelType} from "./t
 const instance = axios.create({
   baseURL: 'https://social-network.samuraijs.com/api/1.1/',
   withCredentials: true,
-  // headers: {
-  //     'API-KEY': '8f2534e2-22a4-4052-894e-a66c04807482'
-  // }
+  headers: {
+      'API-KEY': 'fe474fb0-e353-423b-ba4a-43fb90adef85'
+  }
 })
 
 // api
