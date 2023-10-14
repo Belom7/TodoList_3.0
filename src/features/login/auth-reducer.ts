@@ -1,107 +1,64 @@
-import {Dispatch} from "redux";
-import {errorAC, ErrorACType, isInitializedAC, IsInitializedACType, preloaderStatusAC} from "../../state/app-reducer";
-import {authApi} from "../../api/todolists-api";
-import {AxiosError} from "axios";
-import {LoginDataType} from "./Login";
+import {Dispatch} from 'redux'
+import {SetAppErrorActionType, setAppStatusAC, SetAppStatusActionType} from 'app/app-reducer'
+import {authAPI, LoginParamsType} from 'api/todolists-api'
+import {handleServerAppError, handleServerNetworkError} from 'utils/error-utils'
 
-const initialState = {
-  isLoggedIn: false
+const initialState: InitialStateType = {
+    isLoggedIn: false
 }
 
-export const authReducer = (state: InitialState = initialState, action: ActionsType): InitialState => {
-  switch (action.type) {
-    case "SET_IS_LOGGED_IN": {
-      return {
-        ...state,
-        isLoggedIn: action.payload.value
-      }
+export const authReducer = (state: InitialStateType = initialState, action: ActionsType): InitialStateType => {
+    switch (action.type) {
+        case 'login/SET-IS-LOGGED-IN':
+            return {...state, isLoggedIn: action.value}
+        default:
+            return state
     }
-    default:
-      return state;
-  }
 }
 
+// actions
 
-export const loginAC = (value: boolean) => {
-  return {
-    type: 'SET_IS_LOGGED_IN',
-    payload: {
-      value
-    }
-  } as const
+export const setIsLoggedInAC = (value: boolean) =>
+    ({type: 'login/SET-IS-LOGGED-IN', value} as const)
+
+
+// thunks
+export const loginTC = (data: LoginParamsType) => (dispatch: Dispatch<ActionsType | SetAppStatusActionType | SetAppErrorActionType>) => {
+    dispatch(setAppStatusAC('loading'))
+    authAPI.login(data)
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(setIsLoggedInAC(true))
+                dispatch(setAppStatusAC('succeeded'))
+            } else {
+                handleServerAppError(res.data, dispatch)
+            }
+        })
+        .catch((error) => {
+            handleServerNetworkError(error, dispatch)
+        })
+}
+export const logoutTC = () => (dispatch: Dispatch<ActionsType | SetAppStatusActionType | SetAppErrorActionType>) => {
+    dispatch(setAppStatusAC('loading'))
+    authAPI.logout()
+        .then(res => {
+            if (res.data.resultCode === 0) {
+                dispatch(setIsLoggedInAC(false))
+                dispatch(setAppStatusAC('succeeded'))
+            } else {
+                handleServerAppError(res.data, dispatch)
+            }
+        })
+        .catch((error) => {
+            handleServerNetworkError(error, dispatch)
+        })
 }
 
+// types
 
-export const loginTC = (data: LoginDataType) => (dispatch: Dispatch) => {
-  dispatch(preloaderStatusAC('loading'))
-  authApi.login(data)
-    .then(res => {
-      if (res.data.resultCode === 0) {
-        dispatch(loginAC(true))
-      } else {
-        const messagesError = res.data.messages[0]
-        if (messagesError) {
-          dispatch(errorAC(messagesError))
-        }
-      }
-    })
-    .catch((e: AxiosError<ErrorACType>) => {
-      dispatch(errorAC(e.message))
-    })
-    .finally(() => {
-      dispatch(preloaderStatusAC('succeeded'))
-    })
-}
-export const logOutTC = () => (dispatch: Dispatch) => {
-  dispatch(preloaderStatusAC('loading'))
-  authApi.logOut()
-    .then(res => {
-      if (res.data.resultCode === 0) {
-        dispatch(loginAC(false))
-      } else {
-        const messagesError = res.data.messages[0]
-        if (messagesError) {
-          dispatch(errorAC(messagesError))
-        }
-      }
-    })
-    .catch((e: AxiosError<ErrorACType>) => {
-      dispatch(errorAC(e.message))
-    })
-    .finally(() => {
-      dispatch(preloaderStatusAC('succeeded'))
-    })
+type ActionsType = ReturnType<typeof setIsLoggedInAC>
+type InitialStateType = {
+    isLoggedIn: boolean
 }
 
-export const authMeTC = () => (dispatch: Dispatch) => {
-  dispatch(preloaderStatusAC('loading'))
-  authApi.authMe()
-    .then(res => {
-      if (res.data.resultCode === 0) {
-        dispatch(loginAC(true))
-      } else {
-        const messagesError = res.data.messages[0]
-        if (messagesError) {
-          dispatch(errorAC(messagesError))
-        }
-      }
-    })
-    .catch((e: AxiosError<ErrorACType>) => {
-      dispatch(errorAC(e.message))
-    })
-    .finally(() => {
-      dispatch(preloaderStatusAC('succeeded'))
-      dispatch(isInitializedAC(true))
-    })
-}
-
-
-//type
-export type LoginACType = ReturnType<typeof loginAC>
-
-type ActionsType =
-  | LoginACType
-  | IsInitializedACType
-
-type InitialState = typeof initialState
-
+type ThunkDispatch = Dispatch<ActionsType | SetAppStatusActionType | SetAppErrorActionType>
