@@ -2,20 +2,16 @@ import React, {useCallback, useEffect} from 'react'
 import {useSelector} from 'react-redux'
 import {AppRootStateType} from 'app/store'
 import {
-    addTodolistTC,
-    changeTodolistTitleTC,
-    fetchTodolistsTC,
     FilterValuesType,
-    removeTodolistTC,
-    TodolistDomainType, todolistsActions
+    TodolistDomainType, todolistsActions, todoListsThunks
 } from './todolists-reducer'
-import {addTaskTC, removeTaskTC, TasksStateType, updateTaskTC} from './tasks-reducer'
-import {TaskStatuses} from 'api/todolists-api'
+import {TasksStateType, tasksThunks} from './tasks-reducer'
 import {Grid, Paper} from '@mui/material'
-import {AddItemForm} from 'components/AddItemForm/AddItemForm'
+import {AddItemForm} from 'common/components/AddItemForm/AddItemForm'
 import {Todolist} from './Todolist/Todolist'
 import {Navigate} from 'react-router-dom'
-import {useAppDispatch} from 'hooks/useAppDispatch';
+import {useAppDispatch} from 'common/hooks/useAppDispatch';
+import {TaskStatuses} from "common/enum/enum";
 
 type PropsType = {
     demo?: boolean
@@ -32,50 +28,33 @@ export const TodolistsList: React.FC<PropsType> = ({demo = false}) => {
         if (demo || !isLoggedIn) {
             return;
         }
-        const thunk = fetchTodolistsTC()
-        dispatch(thunk)
+        dispatch(todoListsThunks.fetchTodolists())
     }, [])
 
-    const removeTask = useCallback(function (id: string, todolistId: string) {
-        const thunk = removeTaskTC(id, todolistId)
+    const removeTask = useCallback(function (taskId: string, todoListId: string) {
+        dispatch(tasksThunks.removeTask({taskId, todoListId}))
+    }, [])
+    const addTask = useCallback(function (title: string, todoListId: string) {
+        dispatch(tasksThunks.addTask({title, todoListId}))
+    }, [])
+    const changeStatus = useCallback(function (taskId: string, status: TaskStatuses, todoListId: string) {
+        dispatch(tasksThunks.updateTask({taskId, domainModel: {status}, todoListId}))
+    }, [])
+    const changeTaskTitle = useCallback(function (taskId: string, newTitle: string, todoListId: string) {
+        const thunk = tasksThunks.updateTask({taskId, domainModel: {title: newTitle}, todoListId})
         dispatch(thunk)
     }, [])
-
-    const addTask = useCallback(function (title: string, todolistId: string) {
-        const thunk = addTaskTC(title, todolistId)
-        dispatch(thunk)
+    const changeFilter = useCallback(function (value: FilterValuesType, todoListId: string) {
+            dispatch(todolistsActions.changeTodolistFilter({todoListId, filter: value}))
+        }, [])
+    const removeTodolist = useCallback(function (todoListId: string) {
+        dispatch(todoListsThunks.removeTodolist({todoListId}))
     }, [])
-
-    const changeStatus = useCallback(function (id: string, status: TaskStatuses, todolistId: string) {
-        const thunk = updateTaskTC(id, {status}, todolistId)
-        dispatch(thunk)
+    const changeTodolistTitle = useCallback(function (todoListId: string, title: string) {
+        dispatch(todoListsThunks.changeTodolistTitle({todoListId, title}))
     }, [])
-
-    const changeTaskTitle = useCallback(function (id: string, newTitle: string, todolistId: string) {
-        const thunk = updateTaskTC(id, {title: newTitle}, todolistId)
-        dispatch(thunk)
-    }, [])
-
-    const changeFilter = useCallback(function (value: FilterValuesType, todolistId: string) {
-            const action = todolistsActions.changeTodolistFilter({id: todolistId, filter: value})
-            dispatch(action)
-        },
-        []
-    )
-
-    const removeTodolist = useCallback(function (id: string) {
-        const thunk = removeTodolistTC(id)
-        dispatch(thunk)
-    }, [])
-
-    const changeTodolistTitle = useCallback(function (id: string, title: string) {
-        const thunk = changeTodolistTitleTC(id, title)
-        dispatch(thunk)
-    }, [])
-
     const addTodolist = useCallback((title: string) => {
-        const thunk = addTodolistTC(title)
-        dispatch(thunk)
+        dispatch(todoListsThunks.addTodolist({title}))
     }, [dispatch])
 
     if (!isLoggedIn) {
